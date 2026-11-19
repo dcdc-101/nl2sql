@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ClaudeCodeTabState">
+    <option name="tabSessions">
+      <map>
+        <entry key="0">
+          <value>
+            <TabSessionState>
+              <option name="projectPath" value="D:\项目\workspace" />
+              <option name="provider" value="claude" />
+              <option name="sessionId" value="b4267ad1-f713-4895-a1b5-ee90323fd416" />
+              <option name="cwd" value="D:\项目\workspace" />
+              <option name="model" value="claude-sonnet-5-5[1m]" />
+              <option name="permissionMode" value="default" />
+              <option name="claudeSupplierId" value="__local_settings_json__" />
+              <option name="codexSupplierId" value="__session_supplier_unavailable__" />
+              <option name="ompApprovalMode" value="" />
+            </TabSessionState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
