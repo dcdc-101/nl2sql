@@ -8,3 +8,4 @@ wheels/
 /conf/
 # Virtual environments
 .venv
+/app/core/logs
