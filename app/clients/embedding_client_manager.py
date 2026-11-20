@@ -15,7 +15,7 @@ class EmbeddingClientManager():
     def _get_url(self):
         return f"http://{self.config.host}:{self.config.port}"
 
-    def init(self):
+    def init_client(self):
         self.client=HuggingFaceEndpointEmbeddings(model=self._get_url())
 
 
@@ -23,7 +23,7 @@ embedding_client_manager=EmbeddingClientManager(app_config.embedding)
 
 if __name__ == "__main__":
     async def test():
-        embedding_client_manager.init()
+        embedding_client_manager.init_client()
 
         text="你好"
         result=embedding_client_manager.client.embed_query(text)
