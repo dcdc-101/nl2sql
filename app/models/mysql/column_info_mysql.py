@@ -4,7 +4,7 @@ from sqlalchemy.types import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 class ColumnInfoMySQL(Base):
-    __talbename__ = 'column_info'
+    __tablename__ = 'column_info'
 
     id: Mapped[str] = mapped_column(
         String(64),

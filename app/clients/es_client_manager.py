@@ -13,11 +13,11 @@ class EsClientManager:
     def _get_url(self):
         return f"http://{self.config.host}:{self.config.port}"
 
-    def init(self):
+    def init_client(self):
         self.client = AsyncElasticsearch(self._get_url())
 
     async def close(self):
-        self.client.close()
+        await self.client.close()
 
 es_client_manager = EsClientManager(app_config.es)
 

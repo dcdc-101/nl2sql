@@ -8,10 +8,10 @@
             <TabSessionState>
               <option name="projectPath" value="D:\项目\workspace" />
               <option name="provider" value="claude" />
-              <option name="sessionId" value="94bbd8cc-cc41-4d15-9815-9e81e01907df" />
+              <option name="sessionId" value="f0593e21-5c6f-40e8-9a34-5d80f1048bc5" />
               <option name="cwd" value="D:\项目\workspace" />
               <option name="model" value="claude-sonnet-5-5[1m]" />
-              <option name="permissionMode" value="default" />
+              <option name="permissionMode" value="bypassPermissions" />
               <option name="claudeSupplierId" value="__local_settings_json__" />
               <option name="codexSupplierId" value="__session_supplier_unavailable__" />
               <option name="ompApprovalMode" value="" />

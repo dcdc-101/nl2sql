@@ -20,7 +20,7 @@ async def start_build():
     dw_mysql_client_manager.init_client()
     meta_mysql_client_manager.init_client()
     qdrant_client_manager.init_client()
-
+    es_client_manager.init_client()
     try:
         async with (dw_mysql_client_manager.session_factory() as dw_session,
                     meta_mysql_client_manager.session_factory() as meta_session,
@@ -31,7 +31,7 @@ async def start_build():
                 value_es_repository=ValueEsRepository(es_client_manager.client),
                 column_qdrant_repository=ColumnQdrantRepository(qdrant_client_manager.client),
                 metric_qdrant_repository=MetricQdrantRepository(qdrant_client_manager.client),
-                embedding_client=embedding_client_manager.embedding_client,
+                embedding_client=embedding_client_manager.client,
             )
 
             await service.build(meta_config)
