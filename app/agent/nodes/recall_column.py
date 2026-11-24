@@ -24,7 +24,7 @@ async def recall_column(state:DataAgentState,runtime:Runtime[DataAgentContext]):
         )
         output_parser=JsonOutputParser()
         chain=prompt_template | llm | output_parser
-        result=llm.invoke({"query":query})
+        result=llm.ainvoke({"query":query})
         logger.info(f"recall_column llm keywords {result}")
         keywords=list(set(keywords+result))
 

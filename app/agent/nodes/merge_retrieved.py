@@ -10,6 +10,38 @@ from app.models.qdrant.column_info_qdrant import ColumnInfoQdrant
 from app.models.qdrant.metric_info_qdrant import MetricInfoQdrant
 
 
+def _convert_column_info_mysql_to_qdrant(column_info_mysql:ColumnInfoMySQL)->ColumnInfoQdrant:
+    return ColumnInfoQdrant(
+        id=column_info_mysql.id,
+        name=column_info_mysql.name,
+        description=column_info_mysql.description,
+        role=column_info_mysql.role,
+        type=column_info_mysql.type,
+        examples=column_info_mysql.examples,
+        table_id=column_info_mysql.table_id,
+        alias=column_info_mysql.alias
+    )
+
+
+def _convert_column_info_qdrant_to_state(column:ColumnInfoQdrant)->ColumnInfoState:
+    return ColumnInfoState(
+        name=column['name'],
+        type=column['type'],
+        role=column["role"],
+        examples=column["examples"],
+        description=column["description"],
+        alias=column["alias"]
+    )
+
+
+def _convert_metric_info_qdrant_to_state(recall_metric:MetricInfoQdrant):
+    return MetricInfoState(
+        name=recall_metric['name'],
+        description=recall_metric["description"],
+        relevant_columns=recall_metric["relevant_columns"],
+        alias=recall_metric["alias"]
+    )
+
 
 async def merge_retrieved(state:DataAgentState,runtime:Runtime[DataAgentContext]):
     runtime.stream_writer({"stage":"合并召回"})
@@ -25,3 +57,49 @@ async def merge_retrieved(state:DataAgentState,runtime:Runtime[DataAgentContext]
             for relevant_column_id in metric["relevant_columns"]:
                 if relevant_column_id not in column_infos_dict:
                     column_info_mysql:ColumnInfoMySQL = await meta_mysql_repo.get_column_info_by_id(relevant_column_id)
+                    column_infos_dict[relevant_column_id] = _convert_column_info_mysql_to_qdrant(column_info_mysql)
+        for recall_value in recall_values:
+            column_id=recall_value["column_id"]
+            if column_id not in column_infos_dict:
+                column_info_mysql:ColumnInfoMySQL = await meta_mysql_repo.get_column_info_by_id(column_id)
+                column_infos_dict[column_id] = _convert_column_info_mysql_to_qdrant(column_info_mysql)
+            if recall_value["values"] not in column_infos_dict[column_id]["examples"]:
+                column_infos_dict[column_id]["examples"].append(recall_value["values"])
+
+        talbe_column_infos_dict:dict[str,list[ColumnInfoQdrant]]={}
+
+        for column_info in column_infos_dict.values():
+            if column_info["table_id"] not in talbe_column_infos_dict:
+                talbe_column_infos_dict[column_info["table_id"]]=[]
+            talbe_column_infos_dict[column_info["table_id"]].append(column_info)
+
+
+        table_infos:list[TableInfoState]=[]
+
+        for table_id,column_infos in talbe_column_infos_dict.items():
+            pf_column_infos:list[ColumnInfoMySQL]=await meta_mysql_repo.get_column_info_by_table_id(table_id)
+            for pf_column_info in pf_column_infos:
+                if pf_column_info.id not in column_infos_dict:
+                    talbe_column_infos_dict[table_id].append(_convert_column_info_mysql_to_qdrant(pf_column_info))
+
+            table_info_mysql:TableInfoMySQL=await meta_mysql_repo.get_table_info_by_id(table_id)
+
+            columns:list[ColumnInfoState]=[_convert_column_info_qdrant_to_state(item) for item in column_infos]
+
+            table_infos.append(TableInfoState(
+                name=table_info_mysql.name,
+                role=table_info_mysql.role,
+                description=table_info_mysql.description,
+                columns=columns
+            ))
+
+        metric_infos=[
+            _convert_metric_info_qdrant_to_state(item) for item in recall_metrics
+        ]
+
+        logger.info(f"合并表信息列表完成：{table_infos}")
+        logger.info(f"合并处理指标列表完成：{metric_infos}")
+        return {"table_infos":table_infos, "metric_infos":metric_infos}
+    except Exception as e:
+        logger.error(f"合并召回失败：{str(e)}")
+        raise
